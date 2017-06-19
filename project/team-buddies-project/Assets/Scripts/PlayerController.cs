@@ -4,19 +4,18 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-	enum RotationMode { Movement, Mouse };
-	RotationMode currentRotationMode = RotationMode.Movement;
-
 	public float gravity;
 	public bool grounded = true; // public for debug
 
 	PlayerMovement movement;
 	PlayerRotation rotation;
+	PlayerAttacking attacking;
 	Rigidbody rb;
 
 	void Start () {
 		movement = GetComponent<PlayerMovement>();
 		rotation = GetComponent<PlayerRotation>();
+		attacking = GetComponent<PlayerAttacking>();
 		rb = GetComponent<Rigidbody>();
 	}
 	
@@ -36,22 +35,33 @@ public class PlayerController : MonoBehaviour {
 			moveDir += Vector3.right;
 		}
 
+		// if moving to any direction
+		movement.Move(moveDir);
+
 		// Jump
 		if (Input.GetKeyDown(KeyCode.Space) && grounded) {
 			movement.Jump();
 			grounded = false;
+		}		
+
+		// Rotation
+		if (attacking.GetHasWeapon()) {
+			rotation.RotateToMousePosition();
+		} else {
+			rotation.RotateToDirection(moveDir);
 		}
 
-		// if moving to any direction
-		if (moveDir.magnitude > 0) {
-			movement.Move(moveDir);
-
-			// Rotation
-			if (currentRotationMode == RotationMode.Movement) {
-				rotation.Rotate(Quaternion.LookRotation(moveDir, Vector3.up));
-			} else if (currentRotationMode == RotationMode.Mouse) {
-				// Rotate to mouse position
-			}
+		// Attacking
+		if (Input.GetKeyDown(KeyCode.Mouse0)) {
+			attacking.Attack();
+		}
+		
+		// DEBUG MODESWITCH
+		if (Input.GetKeyDown(KeyCode.Alpha1)) {
+			attacking.hasWeapon = false;
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha2)) {
+			attacking.hasWeapon = true;
 		}
 	}
 

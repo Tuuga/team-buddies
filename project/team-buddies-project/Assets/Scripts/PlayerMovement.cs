@@ -14,11 +14,15 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	public void Move (Vector3 dir) {
-		dir = dir.normalized;
-		rb.MovePosition(transform.position + dir * movementSpeed * Time.deltaTime);
+		if (dir.magnitude > 0) {
+			dir = dir.normalized;
+			rb.MovePosition(transform.position + dir * movementSpeed * Time.deltaTime);
+			// Walk animation
+		}		
 	}
 	
 	public void Jump () {
 		rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+		// Jump animation
 	}
 }
