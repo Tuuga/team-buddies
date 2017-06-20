@@ -4,22 +4,15 @@ using UnityEngine;
 
 public class PlayerAttacking : MonoBehaviour {
 
+	public LayerMask enemyMask;
 	public GameObject bulletPrefab;
 	public float bulletSpeed;
-
-	public Vector3 punchCheckCenter;
-	public Vector3 punchCheckHalfSize;
-	public bool drawPunchCheckGizmo;
-
-	public LayerMask enemyMask;
 	public bool hasWeapon; // public for debug
 
-	void OnDrawGizmos () {
-		if (drawPunchCheckGizmo) {
-			Gizmos.color = new Color(1, 0, 0, 0.5f);
-			var center = transform.position + transform.right * punchCheckCenter.x + transform.up * punchCheckCenter.y + transform.forward * punchCheckCenter.z;
-			Gizmos.DrawCube(center, punchCheckHalfSize);
-		}
+	PlayerBoxCheck boxCheck;
+
+	void Start () {
+		boxCheck = GetComponent<PlayerBoxCheck>();
 	}
 
 	public void Attack () {
@@ -38,8 +31,7 @@ public class PlayerAttacking : MonoBehaviour {
 	}
 
 	void Punch () {
-		var center = transform.position + transform.right * punchCheckCenter.x + transform.up * punchCheckCenter.y + transform.forward * punchCheckCenter.z;
-		var cols = Physics.OverlapBox(center , punchCheckHalfSize, transform.rotation, enemyMask);
+		var cols = boxCheck.BoxCheck(enemyMask);
 		foreach (Collider c in cols) {
 			var ec = c.transform.root.GetComponent<EnemyController>();
 			if (ec != null) {

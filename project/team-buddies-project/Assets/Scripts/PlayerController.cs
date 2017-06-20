@@ -4,18 +4,23 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+	public LayerMask boxMask;
 	public float gravity;
-	public bool grounded = true; // public for debug
+	public bool grounded = true;	// public for debug
+
+	public BoxBehaviour currentHeldBox;
 
 	PlayerMovement movement;
 	PlayerRotation rotation;
 	PlayerAttacking attacking;
+	PlayerBoxCheck boxCheck;
 	Rigidbody rb;
 
 	void Start () {
 		movement = GetComponent<PlayerMovement>();
 		rotation = GetComponent<PlayerRotation>();
 		attacking = GetComponent<PlayerAttacking>();
+		boxCheck = GetComponent<PlayerBoxCheck>();
 		rb = GetComponent<Rigidbody>();
 	}
 	
@@ -52,8 +57,26 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		// Attacking
-		if (Input.GetKeyDown(KeyCode.Mouse0)) {
+		if (Input.GetKeyDown(KeyCode.Mouse0) && currentHeldBox == null) {
 			attacking.Attack();
+		}
+
+		// Box holding
+		if (Input.GetKeyDown(KeyCode.E)) {
+			var cols = boxCheck.BoxCheck(boxMask);
+			foreach (Collider c in cols) {
+				currentHeldBox = c.transform.root.GetComponentInChildren<BoxBehaviour>();
+				if (currentHeldBox != null) {
+					currentHeldBox.Hold(transform);
+					break;
+				}
+			}
+		}
+
+		// Box throwing
+		if (Input.GetKeyDown(KeyCode.Mouse0) && currentHeldBox != null) {
+			currentHeldBox.Throw(transform.forward);
+			currentHeldBox = null;
 		}
 		
 		// DEBUG MODESWITCH

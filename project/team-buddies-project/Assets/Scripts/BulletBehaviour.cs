@@ -10,8 +10,8 @@ public class BulletBehaviour : MonoBehaviour {
 		Destroy(gameObject, destroyTime);
 	}
 
-	void OnCollisionEnter (Collision c) {
-		var enemy = c.transform.root.GetComponent<EnemyController>();
+	void OnTriggerEnter (Collider c) {
+	var enemy = c.transform.root.GetComponent<EnemyController>();
 		if (enemy != null) {
 			enemy.GetHit();
 		}
